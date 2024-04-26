@@ -4,7 +4,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
-
+const noteRoutes = require("./routes/notesRoutes");
 
 app.use(
   cors({
@@ -18,6 +18,7 @@ app.use(cors());
 
 // Routes
 app.use("/", authRoutes);
+app.use("/notes", noteRoutes);
 
 app.listen(PORT, () => {
   console.log(`welcom to my ${PORT} `);
