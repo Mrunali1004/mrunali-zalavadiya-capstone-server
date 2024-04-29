@@ -10,10 +10,27 @@ exports.getallnotes = async (req, res) => {
 };
 
 exports.postNotes = async (req, res) => {
+  const { categoryId, title, content } = req.body;
+  const {
+    user: { id },
+  } = req;
+
+  if (!categoryId || !title || !content) {
+    return res.status(400).json("Required all field");
+  }
+
   try {
-  } catch (error) {
-    res.status(500).json({
-      message: `Unable to create new Note: ${error}`,
+    const [notesId] = await knex("notes").insert({
+      userId: id,
+      categoryId,
+      title,
+      content,
     });
+
+    const newNote = await knex("notes").where({ id: notesId }).first();
+
+    res.status(201).json({ message: "Note created successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Unable to create new Note" });
   }
 };
