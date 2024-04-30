@@ -1,5 +1,18 @@
 const knex = require("knex")(require("../knexfile"));
 
+exports.getallcategory = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const getallcategory = await knex("category")
+      .where("category.userId", userId)
+      .select("category.userId", "category.id", "category.categoryName");
+
+    res.status(200).json(getallcategory);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 exports.postcategory = async (req, res) => {
   const { categoryName } = req.body;
   const {
