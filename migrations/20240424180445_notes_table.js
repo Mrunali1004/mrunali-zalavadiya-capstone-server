@@ -10,7 +10,7 @@ exports.up = function (knex) {
         table.integer("userId").unsigned().references("users.id");
         table.integer("categoryId").unsigned().references("category.id");
         table.string("title").notNullable();
-        table.string("content", "LONGTEXT").notNullable();
+        table.text("content", "LONGTEXT").notNullable();
         table.timestamp("created_at").defaultTo(knex.fn.now());
         table.timestamp("modified_at").defaultTo(knex.fn.now());
       });
