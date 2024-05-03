@@ -10,6 +10,7 @@ exports.authenticateToken = async (req, res, next) => {
   }
 
   const parsedToken = req.headers.authorization.replace("Bearer ","");
+  console.log(parsedToken)
 
   try {
     const decodedPayload = jwt.verify(parsedToken, JWT_SECRET);
