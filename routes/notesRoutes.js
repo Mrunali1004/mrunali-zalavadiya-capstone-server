@@ -17,6 +17,11 @@ router
   .route("/category/:id")
   .get(notesControllers.getNotesByCategoryId)
 
+  router.get("/search/:keyword", notesControllers.getNotesByKeyword);
+
+
+
+
 
 module.exports = router;
 

@@ -47,6 +47,7 @@ exports.postlogin = async (req, res) => {
       {
         user_id: user.id,
         user_email: user.email,
+        username: user.username 
       },
       JWT_SECRET,
       { expiresIn: "30m" }
