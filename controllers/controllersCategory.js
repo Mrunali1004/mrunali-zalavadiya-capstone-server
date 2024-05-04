@@ -33,8 +33,12 @@ exports.getSingleCategory = async (req, res) => {
 
 exports.deleteCategory = async (req, res) => {
   try {
-    const deleteCategory = knex("category").where({ id: req.params.id }).del();
+    const Category = knex("category").where({ id: req.params.id }).del();
     console.log(deleteCategory);
+
+    if (!Category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
     res
       .status(200)
       .json({ message: `Category ${req.params.id} Deleted Successfully` });
@@ -44,8 +48,8 @@ exports.deleteCategory = async (req, res) => {
 };
 
 exports.editCategory = async (req, res) => {
-  const {  categoryName } = req.body;
-  
+  const { categoryName } = req.body;
+
   const {
     user: { id },
   } = req;

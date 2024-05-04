@@ -3,6 +3,8 @@ const knex = require("knex")(require("../knexfile"));
 // get all note
 exports.getallnotes = async (req, res) => {
   try {
+    // const { search = "" } = req.query;
+    // console.log(search);
     const userId = req.user.id;
     const allNotes = await knex("notes")
       .join("category", "category.id", "=", "notes.categoryId")
@@ -18,6 +20,9 @@ exports.getallnotes = async (req, res) => {
         "notes.modified_at"
       )
       .where("notes.userId", userId);
+    // .where("notes.content", "like", `%${search}\%`);
+
+    console.log(allNotes, userId);
 
     if (allNotes.length === 0) {
       return res.status(404).json({ message: "No notes found for the user" });
@@ -29,21 +34,58 @@ exports.getallnotes = async (req, res) => {
   }
 };
 
+// Get notes by keyword
+exports.getNotesByKeyword = async (req, res) => {
+  try {
+    const { keyword } = req.params;
+    const userId = req.user.id;
+
+    const matchedNotes = await knex("notes")
+      .join("category", "category.id", "=", "notes.categoryId")
+      .join("users", "users.id", "=", "notes.userId")
+      .select(
+        "notes.id",
+        "users.id as userId",
+        "notes.categoryId",
+        "category.categoryName",
+        "notes.title",
+        "notes.content",
+        "notes.created_at",
+        "notes.modified_at"
+      )
+      .where("notes.userId", userId)
+      .where("notes.content", "like", `%${keyword}%`);
+
+    if (matchedNotes.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No notes found matching the keyword" });
+    }
+
+    // Send matched notes as response
+    res.status(200).json(matchedNotes);
+  } catch (error) {
+    // Handle internal server error
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 // get note by id
 exports.getSingleNote = async (req, res) => {
   try {
-    console.log(req.params.id)
+    console.log(req.params.id);
     const singleNote = await knex("notes").where({ id: req.params.id }).first();
 
     if (!singleNote) {
       return res.status(404).json({ message: "No notes found for the user" });
     }
 
-    console.log(singleNote)
+    console.log(singleNote);
 
     res.status(200).json(singleNote);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -112,7 +154,7 @@ exports.postNotes = async (req, res) => {
 
 // edit note
 exports.EditNotes = async (req, res) => {
-  const noteId = req.params.id
+  const noteId = req.params.id;
   const { categoryId, title, content } = req.body;
   const {
     user: { id },
@@ -123,13 +165,17 @@ exports.EditNotes = async (req, res) => {
   }
 
   try {
-    const updatedNote = await knex("notes").where({ id: noteId, userId: id }).update({
-      categoryId,
-      title,
-      content,
-    });
+    const updatedNote = await knex("notes")
+      .where({ id: noteId, userId: id })
+      .update({
+        categoryId,
+        title,
+        content,
+      });
 
-    const newone = await knex("notes").where({ id: noteId, userId: id }).first();
+    const newone = await knex("notes")
+      .where({ id: noteId, userId: id })
+      .first();
 
     if (!updatedNote) {
       return res.status(404).json({ error: "Notes ID not found" });
